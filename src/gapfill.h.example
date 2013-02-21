@@ -1,0 +1,33 @@
+#ifndef PFREAD_H_INCLUDED
+#define PFREAD_H_INCLUDED
+
+void read_sst(char* sst_file, unsigned short* data);
+void read_quality(char* quality_file, unsigned char* data);
+void read_landmask(char* crwdir);
+void write_sst(int jday);
+int get_sstfiles(long julianday, char* crwdir, char* sstfile, char* qualfile);
+long ymd_to_jdnl(int year, int month, int day, int julian_flag);
+void jdnl_to_ymd(long jdnl, int* year, int* month, int* day, int julian_flag);
+int day_of_year(int year, int month, int day);
+
+/* rubbish c++ wrapper as nvcc ignores host-compilation flag */
+#ifdef __cplusplus
+extern "C" {
+#endif
+void preprocess(void);
+void process(unsigned short* sst, unsigned char* quality);
+void postprocess();
+#ifdef __cplusplus
+}
+#endif
+
+#define DIMY 4096
+#define DIMX 8192
+#define NPIXELS 33554432
+
+unsigned char *landmask;
+short *target;
+
+#endif
+
+#include <stdio.h>

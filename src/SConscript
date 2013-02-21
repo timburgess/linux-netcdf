@@ -1,0 +1,24 @@
+# Build file for write binary code
+#
+# To build the debug version, simply type 'scons' on the commandline. This will produce
+# two executables named 'pgapfill' (persistence gapfill) and 'dgapfill' (exponential decay
+# gapfill).
+#
+#
+
+
+Import('env')
+
+# build object files
+writebin = env.Object(['writebin.c'],
+            CPPPATH = '/usr/include/hdf')
+#obj_list = env.Object(Split('main.c get_sstfiles.c jdn_l.c read_landmask.c write_sst.c dateutil.c'))
+
+# link program from object files
+env.Program('writebin', writebin,
+            LIBS = ['jpeg', 'z', 'mfhdf', 'df'],
+            LIBPATH = ['/usr/lib/hdf4', '/usr/local/cuda/lib64'])
+#env.Program('pgapfill', obj_list + hdf_list + persist,
+#            LIBS = ['jpeg', 'z', 'mfhdf', 'df', 'cudart'],
+#            LIBPATH = ['/usr/lib/hdf4', '/usr/local/cuda/lib64'])
+
