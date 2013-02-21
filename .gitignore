@@ -1,3 +1,7 @@
+#Scons files
+.SConstruct.swp
+.sconsign.dblite
+
 # Object files
 *.o
 
