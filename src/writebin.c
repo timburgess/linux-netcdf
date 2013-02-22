@@ -20,7 +20,7 @@
 
 /* write size */
 #define PERMS 0666
-#define NFLOATS 200000000
+#define NFLOATS 500000000
 
 /* performance testing */
 struct timeval t0, t1;
