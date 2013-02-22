@@ -4,50 +4,67 @@
  *
  *    Writes a large binary file
  *
- *    2013-02   tim.burgess@noaa.gov                                      
+ *    2013-02   timburgess@nmac.com
  */
 
 /* includes, system */
 #include <stdlib.h>
-#include <stdio.h>
-#include <syscall.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+//#include <stdint.h>
+#include <unistd.h>
 
 #include "all.h"
 
-#include <sys/time.h>
 
-/* beginning and end of Pathfinder data */
-#define STARTYEAR 1981
-#define STARTMONTH 8
-#define STARTDAY   24
-#define ENDYEAR    2009
-#define ENDMONTH   12
-#define ENDDAY     31
+/* write size */
+#define PERMS 0666
+#define NFLOATS 200000000
 
 /* performance testing */
 struct timeval t0, t1;
 
 
 /* allocate memory on the heap */
-unsigned short sst[DIMY][DIMX];
-unsigned char quality[DIMY][DIMX];
+float sst[NFLOATS];
 
-int main() {
+int main(int argc, char **argv) {
   
-  int julday_start, julday_end;
+  //int julday_start, julday_end;
   //julday_start = (int) ymd_to_jdnl(STARTYEAR, STARTMONTH, STARTDAY, 0);
   //julday_end = (int) ymd_to_jdnl(ENDYEAR, ENDMONTH, ENDDAY, 0);
 
   char *crw_dir;
-  char sst_file[80], qual_file[80];
-  
   crw_dir = getenv("CRWDIR");
+
+  printf("Writing %s\n", argv[1]);
+  printf("Allocated %dMB\n", (int) sizeof(sst)/1000000);
+  printf("Allocated %ld bytes\n", sizeof(sst));
+
+  // init array values
+  for (int i = 0; i < NFLOATS; i++) {
+    sst[i] = 23.4f;
+  }
+
 
   /* start timer */
   gettimeofday(&t0, NULL);
 
+  // open file
+  int fd;
+  if ((fd = open(argv[1], O_CREAT|O_WRONLY|O_TRUNC, PERMS)) == -1) {
+    perror("Could not open for write");
+    exit(1);
+  }
 
-  //write_sst(current_day);
+  // write to file
+  int n_written;
+  n_written = write(fd, sst, sizeof(sst));
+  printf("    Wrote %d bytes\n", n_written);
+
+  // close file
+  close(fd);
 
 
   /* end timer */
