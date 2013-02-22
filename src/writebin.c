@@ -4,7 +4,7 @@
  *
  *    Writes a large binary file
  *
- *    2013-02   timburgess@nmac.com
+ *    2013-02   timburgess@mac.com
  */
 
 /* includes, system */
@@ -31,9 +31,6 @@ float sst[NFLOATS];
 
 int main(int argc, char **argv) {
   
-  //int julday_start, julday_end;
-  //julday_start = (int) ymd_to_jdnl(STARTYEAR, STARTMONTH, STARTDAY, 0);
-  //julday_end = (int) ymd_to_jdnl(ENDYEAR, ENDMONTH, ENDDAY, 0);
 
   char *crw_dir;
   crw_dir = getenv("CRWDIR");
