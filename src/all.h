@@ -2,12 +2,8 @@
 #define PFREAD_H_INCLUDED
 
 
-#define DIMY 4096
-#define DIMX 8192
-#define NPIXELS 33554432
+#define NFLOATS 500000000
 
-unsigned char *landmask;
-short *target;
 
 #endif
 

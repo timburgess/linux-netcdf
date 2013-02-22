@@ -1,7 +1,7 @@
-# Build file for write binary code
+# Build file for binary write/read code
 #
-# To build the debug version, simply type 'scons' on the commandline. This will produce
-# an executable named 'writebin'
+# To build the debug version, simply type 'scons dbg' on the commandline. This will produce
+# executables named 'writebin','readbin' in the dbg directory
 # 
 #
 #
@@ -11,12 +11,14 @@ Import('env')
 
 # build object files
 writebin = env.Object(['writebin.c'])
+writebin = env.Object(['readbin.c'])
 #            CPPPATH = '/usr/include/hdf')
 #obj_list = env.Object(Split('main.c get_sstfiles.c jdn_l.c read_landmask.c write_sst.c dateutil.c'))
 
 # link program from object files
-env.Program('writebin', writebin,
-            LIBS = ['jpeg'])
+env.Program('writebin', writebin)
+env.Program('readbin', writebin)
+#            LIBS = ['jpeg'])
 #            LIBPATH = ['/usr/lib/hdf4', '/usr/local/cuda/lib64'])
 #env.Program('pgapfill', obj_list + hdf_list + persist,
 #            LIBS = ['jpeg', 'z', 'mfhdf', 'df', 'cudart'],
