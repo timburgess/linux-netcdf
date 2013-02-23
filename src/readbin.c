@@ -29,9 +29,6 @@ float sst[NFLOATS];
 int main(int argc, char **argv) {
   
 
-  char *crw_dir;
-  crw_dir = getenv("CRWDIR");
-
   printf("Reading %s\n", argv[1]);
 
 

@@ -12,13 +12,15 @@ Import('env')
 # build object files
 writebin = env.Object(['writebin.c'])
 readbin = env.Object(['readbin.c'])
+aiowrite = env.Object(['aiowrite.c'])
 #            CPPPATH = '/usr/include/hdf')
 #obj_list = env.Object(Split('main.c get_sstfiles.c jdn_l.c read_landmask.c write_sst.c dateutil.c'))
 
 # link program from object files
 env.Program('writebin', writebin)
 env.Program('readbin', readbin)
-#            LIBS = ['jpeg'])
+env.Program('aiowrite', aiowrite,
+            LIBS = ['aio'])
 #            LIBPATH = ['/usr/lib/hdf4', '/usr/local/cuda/lib64'])
 #env.Program('pgapfill', obj_list + hdf_list + persist,
 #            LIBS = ['jpeg', 'z', 'mfhdf', 'df', 'cudart'],

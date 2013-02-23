@@ -31,9 +31,6 @@ float sst[NFLOATS];
 int main(int argc, char **argv) {
   
 
-  char *crw_dir;
-  crw_dir = getenv("CRWDIR");
-
   printf("Writing %s\n", argv[1]);
   printf("Allocated %dMB\n", (int) sizeof(sst)/1000000);
   printf("Allocated %ld bytes\n", sizeof(sst));
@@ -47,9 +44,9 @@ int main(int argc, char **argv) {
   /* start timer */
   gettimeofday(&t0, NULL);
 
-  // open file
+  // open file to block until write to disk complete
   int fd;
-  if ((fd = open(argv[1], O_CREAT|O_WRONLY|O_TRUNC, PERMS)) == -1) {
+  if ((fd = open(argv[1], O_CREAT|O_WRONLY|O_TRUNC|O_SYNC, PERMS)) == -1) {
     perror("Could not open for write");
     exit(1);
   }
