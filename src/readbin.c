@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
   printf("Read %d bytes\n", (int)n_read);
 
   // close file
-  close(fd);
+  if (close(fd) == -1) perror("Failed to close file");
 
 
   /* end timer */

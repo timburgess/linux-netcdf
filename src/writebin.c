@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
   printf("    Wrote %d bytes\n", n_written);
 
   // close file
-  close(fd);
+  if (close(fd) == -1) perror("Failed to close file");
 
 
   /* end timer */
