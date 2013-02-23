@@ -52,7 +52,8 @@ int open_write(char const* file) {
 void* make_write_buffer(size_t size) {
 
   long pagesize = sysconf(_SC_PAGESIZE);
-  printf("Paegsize is %ld\n", pagesize);
+  printf("Pagesize is %ld\n", pagesize);
+  printf("Buffer size is %zuMB\n", size/1024/1024);
   void* buf = 0;
   int ret = posix_memalign((void**)&buf, pagesize, size);
   if (ret < 0 || buf == 0) {
@@ -66,7 +67,7 @@ void* make_write_buffer(size_t size) {
 int main(int argc, char **argv) {
   
   /* buffer size */
-  static const size_t SIZE = 16 * 1024;
+  static const size_t SIZE = 64 * 4096 * 4096;
 
   printf("Writing %s\n", argv[1]);
 
@@ -108,11 +109,11 @@ int main(int argc, char **argv) {
   long min_nr = 1;
   long nr = 10;
   int n_complete = io_getevents(ctx, min_nr, nr, events, NULL);
-  printf("Completed %d events", n_complete);
+  printf("Completed %d events\n", n_complete);
 
 
   // wrap up
-  if (close(fd) == -1) perror("Cannot clode file");
+  if (close(fd) == -1) perror("Cannot close file");
 
   /* end timer */
   gettimeofday(&t1, NULL);
