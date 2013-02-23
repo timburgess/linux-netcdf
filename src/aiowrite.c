@@ -51,8 +51,10 @@ int open_write(char const* file) {
 
 void* make_write_buffer(size_t size) {
 
+  long pagesize = sysconf(_SC_PAGESIZE);
+  printf("Paegsize is %ld\n", pagesize);
   void* buf = 0;
-  int ret = posix_memalign((void**)&buf, sysconf(_SC_PAGESIZE), size);
+  int ret = posix_memalign((void**)&buf, pagesize, size);
   if (ret < 0 || buf == 0) {
     perror("Failed to create write buffer");
     exit(1);
@@ -67,9 +69,6 @@ int main(int argc, char **argv) {
   static const size_t SIZE = 16 * 1024;
 
   printf("Writing %s\n", argv[1]);
-
-  //printf("Allocated %dMB\n", (int) sizeof(sst)/1000000);
-  //printf("Allocated %ld bytes\n", sizeof(sst));
 
   /* init array values
   for (int i = 0; i < NFLOATS; i++) {
@@ -91,21 +90,26 @@ int main(int argc, char **argv) {
   io_setup(maxEvents, &ctx);
 
 
-  /* setup request 
+  /* setup request */ 
   struct iocb *iocbpp = (struct iocb*) malloc(sizeof(struct iocb));
   io_prep_pwrite(iocbpp, fd, buf, SIZE, 0);
 
 
+  /* submit request */
   int status = io_submit(ctx, 1, &iocbpp);
   if (status < 0) {
-    int errno = -status;
+    //int errno = -status;
     perror("iosubmit failed");
     exit(1);
   }
 
-  io_event events[10];
-  int n = io_getevents(ctx, 1, 10, events, NULL);
-*/
+  /* check events */
+  struct io_event events[10];
+  long min_nr = 1;
+  long nr = 10;
+  int n_complete = io_getevents(ctx, min_nr, nr, events, NULL);
+  printf("Completed %d events", n_complete);
+
 
   // wrap up
   if (close(fd) == -1) perror("Cannot clode file");
