@@ -12,6 +12,7 @@
 #define _GNU_SOURCE
 
 /* includes, system */
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -20,7 +21,6 @@
 #include <unistd.h>
 #include <libaio.h>
 
-#include "all.h"
 
 /* prototypes */
 int open_write(char const*);
