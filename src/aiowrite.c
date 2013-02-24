@@ -67,15 +67,9 @@ void* make_write_buffer(size_t size) {
 int main(int argc, char **argv) {
   
   /* buffer size */
-  static const size_t SIZE = 64 * 4096 * 4096;
+  static const size_t SIZE = 32 * 4096 * 4096;
 
   printf("Writing %s\n", argv[1]);
-
-  /* init array values
-  for (int i = 0; i < NFLOATS; i++) {
-    sst[i] = 23.4f;
-  }*/
-
 
   /* start timer */
   gettimeofday(&t0, NULL);
@@ -83,6 +77,7 @@ int main(int argc, char **argv) {
   /* prepare file and write buffer */
   int fd = open_write(argv[1]);
   void* buf = make_write_buffer(SIZE); 
+  void* buf2 = make_write_buffer(SIZE); 
 
   /* prepare aio */
   io_context_t ctx;
@@ -90,14 +85,23 @@ int main(int argc, char **argv) {
   const int maxEvents = 32;
   io_setup(maxEvents, &ctx);
 
+  /* setup request array */
+  struct iocb *iocbs[2];
+  for (int i = 0; i < 2; i++) {
+    struct iocb *io = (struct iocb*) malloc(sizeof(struct iocb));
+    iocbs[i] = io;
+  }
 
-  /* setup request */ 
-  struct iocb *iocbpp = (struct iocb*) malloc(sizeof(struct iocb));
-  io_prep_pwrite(iocbpp, fd, buf, SIZE, 0);
+
+  /* prep requests */ 
+  off_t offset = 0;
+  io_prep_pwrite(iocbs[0], fd, buf, SIZE, offset);
+  offset += (int)SIZE;
+  io_prep_pwrite(iocbs[1], fd, buf2, SIZE, offset);
 
 
   /* submit request */
-  int status = io_submit(ctx, 1, &iocbpp);
+  int status = io_submit(ctx, 2, iocbs);
   if (status < 0) {
     //int errno = -status;
     perror("iosubmit failed");
