@@ -2,7 +2,7 @@
 #define PFREAD_H_INCLUDED
 
 
-#define NFLOATS 250000000
+#define NFLOATS 500000000
 
 
 #endif

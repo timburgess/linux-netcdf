@@ -52,9 +52,9 @@ int main(int argc, char **argv) {
   }
 
   // write to file
-  int n_written;
+  ssize_t n_written;
   n_written = write(fd, sst, sizeof(sst));
-  printf("    Wrote %d bytes\n", n_written);
+  printf("    Wrote %zu bytes\n", n_written);
 
   // close file
   if (close(fd) == -1) perror("Failed to close file");
