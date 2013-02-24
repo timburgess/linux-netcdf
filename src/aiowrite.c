@@ -27,15 +27,13 @@ int open_write(char const*);
 void* make_write_buffer(size_t);
 
 
-/* file perms */
-#define PERMS 0666
+#define NBUFS 4    /* number of buffers to use */
+#define PERMS 0666 /* file perms */
 
 /* performance testing */
 struct timeval t0, t1;
 
 
-/* allocate memory on the heap */
-//float sst[NFLOATS];
 
 /* open new file for write */
 int open_write(char const* file) {
@@ -74,10 +72,13 @@ int main(int argc, char **argv) {
   /* start timer */
   gettimeofday(&t0, NULL);
 
-  /* prepare file and write buffer */
+  /* prepare write buffers and open file */
   int fd = open_write(argv[1]);
-  void* buf = make_write_buffer(SIZE); 
-  void* buf2 = make_write_buffer(SIZE); 
+  void *bufs[NBUFS];
+  for (int i = 0; i < NBUFS; i++) {
+    void* buf = make_write_buffer(SIZE); 
+    bufs[i] = buf;
+  }
 
   /* prepare aio */
   io_context_t ctx;
@@ -86,8 +87,8 @@ int main(int argc, char **argv) {
   io_setup(maxEvents, &ctx);
 
   /* setup request array */
-  struct iocb *iocbs[2];
-  for (int i = 0; i < 2; i++) {
+  struct iocb *iocbs[NBUFS];
+  for (int i = 0; i < NBUFS; i++) {
     struct iocb *io = (struct iocb*) malloc(sizeof(struct iocb));
     iocbs[i] = io;
   }
@@ -95,9 +96,13 @@ int main(int argc, char **argv) {
 
   /* prep requests */ 
   off_t offset = 0;
-  io_prep_pwrite(iocbs[0], fd, buf, SIZE, offset);
+  io_prep_pwrite(iocbs[0], fd, bufs[0], SIZE, offset);
   offset += (int)SIZE;
-  io_prep_pwrite(iocbs[1], fd, buf2, SIZE, offset);
+  io_prep_pwrite(iocbs[1], fd, bufs[1], SIZE, offset);
+  offset += (int)SIZE;
+  io_prep_pwrite(iocbs[0], fd, bufs[2], SIZE, offset);
+  offset += (int)SIZE;
+  io_prep_pwrite(iocbs[0], fd, bufs[3], SIZE, offset);
 
 
   /* submit request */
@@ -124,8 +129,9 @@ int main(int argc, char **argv) {
   printf("Took %.2g seconds\n", t1.tv_sec - t0.tv_sec + 1E-6 * (double)(t1.tv_usec - t0.tv_usec));
 
   io_destroy(ctx);
-  //delete iocbpp;
-  free(buf);
+  for (int i = 0; i < NBUFS; i++) {
+    free(bufs[i]);
+  }
 
   printf("Done.\n");
   return 0;
