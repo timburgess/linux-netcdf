@@ -5,7 +5,7 @@
 #
 
 # setup environments
-dbg = Environment(CFLAGS = '-g -O0 -Wall -std=c99 -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wmissing-prototypes -Wnested-externs')
+dbg = Environment(CFLAGS = '-ggdb -O0 -Wall -std=c99 -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wmissing-prototypes -Wnested-externs')
 opt = Environment(CFLAGS = '-O3 -Wall -std=c99 -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wmissing-prototypes -Wnested-externs')
 
 # iterate through debug and optimized builds - using same src 

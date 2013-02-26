@@ -19,49 +19,49 @@ http://www.unidata.ucar.edu/software/netcdf/docs.
 #include <stdlib.h>
 #include <stdio.h>
 #include <netcdf.h>
+#include <sys/time.h>
 
 /* This is the name of the data file we will create. */
 //#define FILE_NAME "simple_nc4.nc"
 
 /* We are writing 2D data, a 6 x 12 grid. */
 #define NDIMS 2
-#define NX 6
-#define NY 12
+#define NX 16384
+#define NY 16384
 
 /* Handle errors by printing an error message and exiting with a
  * non-zero status. */
 #define ERRCODE 2
 #define ERR(e) {printf("Error: %s\n", nc_strerror(e)); exit(ERRCODE);}
 
+/* performance testing */
+struct timeval t0, t1;
+
+
 int main(int argc, char **argv) {
  
    /* When we create netCDF variables, groups, dimensions, or types,
     * we get back an ID for each one. */
-   int ncid, x_dimid, y_dimid, varid1, varid2, grp1id, grp2id, typeid;
+   int ncid, x_dimid, y_dimid, varid1;
    int dimids[NDIMS];
 
    /* This is the data array we will write. It will be filled with a
     * progression of numbers for this example. */
-   unsigned long long data_out[NX][NY];
+   static float data[NX][NY];
 
    /* Loop indexes, and error handling. */
    int x, y, retval;
 
-   /* The following struct is written as a compound type. */
-   struct s1 
-   {
-         int i1;
-         int i2;
-   };
-   struct s1 compound_data[NX][NY];
+
+   /* start timer */
+   gettimeofday(&t0, NULL);
+
 
    /* Create some pretend data. */
    for (x = 0; x < NX; x++)
       for (y = 0; y < NY; y++)
       {
-         data_out[x][y] = x * NY + y;
-         compound_data[x][y].i1 = 42;
-         compound_data[x][y].i2 = -42;
+         data[x][y] = (float) (x * NY + y);
       }
 
    /* Create the file. The NC_NETCDF4 flag tells netCDF to
@@ -80,49 +80,27 @@ int main(int argc, char **argv) {
    dimids[0] = x_dimid;
    dimids[1] = y_dimid;
 
-   /* Define two groups, "grp1" and "grp2." */
-   if ((retval = nc_def_grp(ncid, "grp1", &grp1id)))
-      ERR (retval);
-   if ((retval = nc_def_grp(ncid, "grp2", &grp2id)))
-      ERR (retval);
-
    /* Define an unsigned 64bit integer variable in grp1, using dimensions
     * in the root group. */
-   if ((retval = nc_def_var(grp1id, "data", NC_UINT64, NDIMS, 
+   if ((retval = nc_def_var(ncid, "data", NC_UINT64, NDIMS, 
                             dimids, &varid1)))
       ERR(retval);
 
    /* Write unsigned long long data to the file. For netCDF-4 files,
     * nc_enddef will be called automatically. */
-   if ((retval = nc_put_var_ulonglong(grp1id, varid1, &data_out[0][0])))
+   if ((retval = nc_put_var_float(ncid, varid1, &data[0][0])))
       ERR(retval);
 
-   /* Create a compound type. This will cause nc_reddef to be called. */
-   if (nc_def_compound(grp2id, sizeof(struct s1), "sample_compound_type", 
-                       &typeid))
-      ERR(retval);
-   if (nc_insert_compound(grp2id, typeid, "i1", 
-                          offsetof(struct s1, i1), NC_INT))
-      ERR(retval);
-   if (nc_insert_compound(grp2id, typeid, "i2", 
-                          offsetof(struct s1, i2), NC_INT))
-      ERR(retval);
-
-   /* Define a compound type variable in grp2, using dimensions
-    * in the root group. */
-   if ((retval = nc_def_var(grp2id, "data", typeid, NDIMS, 
-                            dimids, &varid2)))
-      ERR(retval);
-
-   /* Write the array of struct to the file. This will cause nc_endef
-    * to be called. */
-   if ((retval = nc_put_var(grp2id, varid2, &compound_data[0][0])))
-      ERR(retval);
 
    /* Close the file. */
    if ((retval = nc_close(ncid)))
       ERR(retval);
 
-   printf("*** SUCCESS writing example file simple_nc4.nc!\n");
+   /* end timer */
+   gettimeofday(&t1, NULL);
+   printf("Took %.2g seconds\n", t1.tv_sec - t0.tv_sec + 1E-6 * (double)(t1.tv_usec - t0.tv_usec));
+
+
+   printf("*** wrote example file\n");
    return 0;
 }

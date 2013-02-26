@@ -14,6 +14,7 @@ writebin = env.Object(['writebin.c'])
 readbin = env.Object(['readbin.c'])
 aiowrite = env.Object(['aiowrite.c'])
 simple_nc4wr = env.Object(['simple_nc4_wr.c'])
+try1 = env.Object(['try1.c'])
 #            CPPPATH = '/usr/include/hdf')
 #obj_list = env.Object(Split('main.c get_sstfiles.c jdn_l.c read_landmask.c write_sst.c dateutil.c'))
 
@@ -24,6 +25,7 @@ env.Program('aiowrite', aiowrite,
             LIBS = ['aio'])
 env.Program('simple_nc4_write', simple_nc4wr,
             LIBS = ['netcdf'])
+env.Program('try', try1)
 #            LIBPATH = ['/usr/lib/hdf4', '/usr/local/cuda/lib64'])
 #env.Program('pgapfill', obj_list + hdf_list + persist,
 #            LIBS = ['jpeg', 'z', 'mfhdf', 'df', 'cudart'],
